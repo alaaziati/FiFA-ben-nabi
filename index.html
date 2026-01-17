@@ -68,7 +68,10 @@ header p{color:#ddd;margin-top:8px}
   max-width:900px;
   border-radius:20px;
   padding:20px;
-  position:relative
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 .close{
   position:absolute;
@@ -93,7 +96,8 @@ header p{color:#ddd;margin-top:8px}
 .pitches{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:20px
+  gap:20px;
+  width:100%;
 }
 @media(max-width:768px){
   .pitches{grid-template-columns:1fr}
@@ -133,25 +137,34 @@ header p{color:#ddd;margin-top:8px}
   position:absolute;
   background:#fff;
   color:#000;
-  padding:6px;
-  border-radius:50%;
-  font-size:11px;
-  font-weight:700;
   width:52px;
   height:52px;
+  border-radius:50%;
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
-  text-align:center
+  font-size:11px;
+  font-weight:700;
+  text-align:center;
+  padding:2px;
+  transition: all 1s ease; /* حركة سلسة */
+}
+.player img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:2px;
 }
 .blue{background:#4fc3f7}
 .red{background:#ff8a80}
 
-.gk{bottom:15px; left:50%; transform:translateX(-50%)}
-.def1{top:45%; left:15%}
-.def2{top:45%; right:15%}
-.att1{top:20%; left:30%}
-.att2{top:20%; right:30%}
+.gk{bottom:15px; left:50%; transform:translateX(-50%) }
+.def1{top:45%; left:15% }
+.def2{top:45%; right:15% }
+.att1{top:20%; left:30% }
+.att2{top:20%; right:30% }
 
 .captain{border:3px solid #ffd700}
 
@@ -169,6 +182,17 @@ footer{
   font-size:14px;
   background:rgba(0,0,0,.4);
   color:#ccc
+}
+
+button{
+  margin:8px;
+  padding:8px 15px;
+  border:none;
+  border-radius:8px;
+  background:#ffd700;
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -191,6 +215,11 @@ footer{
     <div class="time">⏰ التوقيت: يُحدد لاحقًا</div>
 
     <div class="pitches" id="pitchesContainer"></div>
+
+    <!-- أزرار التحكم -->
+    <button onclick="attack()">هجوم الفريق الأزرق</button>
+    <button onclick="defend()">عودة الدفاع</button>
+    <button onclick="closeModal()">خروج من التشكيلة</button>
   </div>
 </div>
 
@@ -207,17 +236,24 @@ const modal=document.getElementById("modal");
 const matchTitle=document.getElementById("matchTitle");
 const pitchesContainer=document.getElementById("pitchesContainer");
 
+function defaultPlayer(name,color){
+  return `<div class="player ${color}">
+    <img src="images/placeholder.jpg" alt="${name}">
+    <span>${name}</span>
+  </div>`;
+}
+
 function defaultTeam(name,color){
   return `
   <div>
     <div class="team-title">${name}</div>
     <div class="pitch">
       <div class="center-line"></div>
-      <div class="player ${color} gk">GK<br>لاحقًا</div>
-      <div class="player ${color} def1">DEF<br>لاحقًا</div>
-      <div class="player ${color} def2">DEF<br>لاحقًا</div>
-      <div class="player ${color} att1">ATT<br>لاحقًا</div>
-      <div class="player ${color} att2">ATT<br>لاحقًا</div>
+      ${defaultPlayer("GK",color)}
+      ${defaultPlayer("DEF1",color)}
+      ${defaultPlayer("DEF2",color)}
+      ${defaultPlayer("ATT1",color)}
+      ${defaultPlayer("ATT2",color)}
     </div>
     <div class="subs">احتياط: يُحدد لاحقًا</div>
   </div>`;
@@ -229,16 +265,44 @@ function team2s2(){
     <div class="team-title">فريق 2s2</div>
     <div class="pitch">
       <div class="center-line"></div>
-      <div class="player blue gk captain">GK<br>زياتي<br>علاء الدين ⭐</div>
-      <div class="player blue def1">DEF<br>سريان<br>أسامة</div>
-      <div class="player blue def2">DEF<br>بن ديدا<br>عبد الرحمان</div>
-      <div class="player blue att1">ATT<br>بلحاجي<br>محمد</div>
-      <div class="player blue att2">ATT<br>دحماني<br>عماد</div>
+      <div class="player blue gk captain">
+        <img src="images/myphoto.jpg" alt="زياتي علاء الدين">
+        <span>زياتي علاء الدين ⭐</span>
+      </div>
+      <div class="player blue def1">
+        <img src="images/placeholder.jpg" alt="سريان أسامة">
+        <span>سريان أسامة</span>
+      </div>
+      <div class="player blue def2">
+        <img src="images/placeholder.jpg" alt="بن ديدا عبد الرحمان">
+        <span>بن ديدا عبد الرحمان</span>
+      </div>
+      <div class="player blue att1">
+        <img src="images/placeholder.jpg" alt="بلحاجي محمد">
+        <span>بلحاجي محمد</span>
+      </div>
+      <div class="player blue att2">
+        <img src="images/placeholder.jpg" alt="دحماني عماد">
+        <span>دحماني عماد</span>
+      </div>
     </div>
     <div class="subs">احتياط: بوزعتر عبد الحكيم</div>
+  </div>
+  <div>
+    <div class="team-title">فريق 2L</div>
+    <div class="pitch">
+      <div class="center-line"></div>
+      ${defaultPlayer("GK","red")}
+      ${defaultPlayer("DEF1","red")}
+      ${defaultPlayer("DEF2","red")}
+      ${defaultPlayer("ATT1","red")}
+      ${defaultPlayer("ATT2","red")}
+    </div>
+    <div class="subs">احتياط: يُحدد لاحقًا</div>
   </div>`;
 }
 
+// إنشاء المباريات
 matches.forEach(m=>{
   const div=document.createElement("div");
   div.className="match";
@@ -252,16 +316,14 @@ matches.forEach(m=>{
   div.onclick=()=>{
     matchTitle.textContent=m;
     pitchesContainer.innerHTML="";
-
     if(m==="2s2 vs 2L"){
       pitchesContainer.innerHTML=
-        team2s2() + defaultTeam("فريق 2L","red");
+        team2s2();
     }else{
       pitchesContainer.innerHTML=
         defaultTeam("الفريق الأول","blue") +
         defaultTeam("الفريق الثاني","red");
     }
-
     modal.style.display="flex";
   };
   container.appendChild(div);
@@ -269,6 +331,31 @@ matches.forEach(m=>{
 
 function closeModal(){
   modal.style.display="none";
+}
+
+// ======== حركة اللاعبين ========
+function movePlayer(playerClass, top, left){
+  const player=document.querySelector(`.${playerClass}`);
+  if(player){
+    player.style.top=top;
+    player.style.left=left;
+  }
+}
+
+// مثال هجوم الفريق الأزرق
+function attack(){
+  movePlayer("att1","10%","25%");
+  movePlayer("att2","10%","55%");
+  movePlayer("def1","35%","20%");
+  movePlayer("def2","35%","50%");
+}
+
+// العودة لمراكز الدفاع
+function defend(){
+  movePlayer("att1","20%","30%");
+  movePlayer("att2","20%","70%");
+  movePlayer("def1","45%","15%");
+  movePlayer("def2","45%","85%");
 }
 </script>
 
